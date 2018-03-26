@@ -18,3 +18,15 @@ _build/
 # oasis generated files
 setup.data
 setup.log
+
+# Bucklescript ignores
+.DS_Store
+/node_modules*
+.merlin
+/lib/
+*.log
+.bsb.lock
+tests/test.data
+src/*.js
+__tests__/*.js
+/coverage
