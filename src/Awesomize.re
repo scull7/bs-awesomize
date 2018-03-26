@@ -117,6 +117,10 @@ module Validate = {
   };
 };
 
+/*
+  @TODO - clean up the return, unwrap the option from the map.
+  @TODO - accept a parser to parse a successful response.
+*/
 module Awesomize = {
   open Js.Promise;
 
