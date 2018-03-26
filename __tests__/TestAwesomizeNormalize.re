@@ -6,7 +6,7 @@ let parseNumber = x =>
   | _ => failwith("invalid_json")
   };
 
-describe("Awesomize Sanitize", () => {
+describe("Awesomize Normalize", () => {
   let schema =
     Awesomize.make([|
       (
@@ -14,7 +14,7 @@ describe("Awesomize Sanitize", () => {
         {
           read: Awesomize.Read.key("test"),
           sanitize:
-            Awesomize.Sanitizer.makeClassified(
+            Awesomize.Normalizer.makeClassified(
               fun
               | Js.Json.JSONString(_) => Some(Js.Json.number(42.0))
               | Js.Json.JSONNumber(n) => Some(Js.Json.number(n))
@@ -25,11 +25,11 @@ describe("Awesomize Sanitize", () => {
         },
       ),
     |]);
-  testPromise("Sanitize should run when the value exists", () =>
+  testPromise("Normalize should run when the value exists", () =>
     schema([|("test", Js.Json.string("moo"))|] |> Js.Dict.fromArray)
     |> Awesomize.Result.fold(
          err => {
-           Js.log2("Awesome Sanitize:1 - ", err);
+           Js.log2("Awesome Normalize:1 - ", err);
            (-1.0);
          },
          res =>

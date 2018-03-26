@@ -65,43 +65,33 @@ describe("Awesomize Validation", () => {
       |]);
     testPromise("Success", () =>
       schema([|("test", Js.Json.number(1.0))|] |> Js.Dict.fromArray)
-      |> Js.Promise.then_(result =>
-           (
-             switch (result) {
-             | `Error(err) =>
-               Js.log2("Require Integer:Sucesss - failed: ", err);
-               (-1.0);
-             | `Ok(res) =>
-               switch (Belt.Map.String.get(res, "test")) {
-               | None => (-2.0)
-               | Some(x) => parseNumber(x)
-               }
-             }
-           )
-           |> Js.Promise.resolve
+      |> Awesomize.Result.fold(
+           err => {
+             Js.log2("Require Integer:Sucesss - failed: ", err);
+             (-1.0);
+           },
+           res =>
+             switch (Belt.Map.String.get(res, "test")) {
+             | None => (-2.0)
+             | Some(x) => parseNumber(x)
+             },
          )
       |> Js.Promise.then_(result =>
            Expect.expect(result) |> Expect.toBe(1.0) |> Js.Promise.resolve
          )
     );
+    let unexpectedSuccess = res => {
+      Js.log2("Require Integer:Failure - unexpected success: ", res);
+      "unexpected_success";
+    };
+    let getMessage = (key, err) =>
+      switch (Awesomize.Result.Error.getMessage(key, err)) {
+      | None => "missing_message"
+      | Some(message) => message
+      };
     testPromise("Failure", () =>
       schema([|("test", Js.Json.number(1.1))|] |> Js.Dict.fromArray)
-      |> Js.Promise.then_(result =>
-           (
-             switch (result) {
-             | `Ok(res) =>
-               Js.log2("Require Integer:Failure - unexpected success: ", res);
-               "unexpected_success";
-             | `Error(err) =>
-               switch (Belt.Map.String.get(err, "test")) {
-               | None => "missing_field"
-               | Some(None) => "missing_message"
-               | Some(Some(message)) => message
-               }
-             }
-           )
-           |> Js.Promise.resolve
-         )
+      |> Awesomize.Result.fold(getMessage("test"), unexpectedSuccess)
       |> Js.Promise.then_(message =>
            Expect.expect(message)
            |> Expect.toBe("not_int")
@@ -110,22 +100,7 @@ describe("Awesomize Validation", () => {
     );
     testPromise("Missing", () =>
       schema([||] |> Js.Dict.fromArray)
-      |> Js.Promise.then_(result =>
-           (
-             switch (result) {
-             | `Ok(res) =>
-               Js.log2("Require Integer:Failure - unexpected success: ", res);
-               "unexpected_success";
-             | `Error(err) =>
-               switch (Belt.Map.String.get(err, "test")) {
-               | None => "missing_field"
-               | Some(None) => "missing_message"
-               | Some(Some(message)) => message
-               }
-             }
-           )
-           |> Js.Promise.resolve
-         )
+      |> Awesomize.Result.fold(getMessage("test"), unexpectedSuccess)
       |> Js.Promise.then_(message =>
            Expect.expect(message)
            |> Expect.toBe("required")

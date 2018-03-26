@@ -162,4 +162,10 @@ let make = Awesomize.make;
 
 module Read = Awesomize_read;
 
+module Result = Awesomize_result;
+
+module Normalizer = Awesomize_data_scrub;
+
+module Sanitizer = Awesomize_data_scrub;
+
 module Validator = Awesomize_validator;
