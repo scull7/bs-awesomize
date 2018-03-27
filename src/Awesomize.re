@@ -27,11 +27,7 @@ type resultMap = Belt.Map.String.t(Js.Json.t);
 
 type schema = Js.Array.t((string, definition));
 
-let unwrap =
-  fun
-  | None => None
-  | Some(None) => None
-  | Some(Some(x)) => Some(x);
+let unwrap = Awesomize_util.unwrap;
 
 module Compiler = {
   let make = (generator, definitionMap) => {
@@ -99,7 +95,13 @@ module Validate = {
     | [test, ...rest] => iterate(key, test, input, run(key, rest))
     };
   let compiler =
-    ((key, definition) => run(key, definition.validate)) |> Compiler.make;
+    Compiler.make((key, definition) =>
+      switch (definition.validate) {
+      | [] =>
+        failwith({j|You must provide at least one validator for key: $key|j})
+      | tests => run(key, tests)
+      }
+    );
   module Response = {
     let hasError = res =>
       Belt.Map.String.some(res, (_, v) =>
