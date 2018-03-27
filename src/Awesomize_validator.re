@@ -88,3 +88,40 @@ let externRaw = (fn, msg, maybe, sanitized) =>
        )
        |> Js.Promise.resolve
      );
+
+let extern = (fn, msg, maybe, sanitized) =>
+  switch (maybe) {
+  | None => None |> Js.Promise.resolve
+  | Some(json) =>
+    json
+    |> Js.Json.classify
+    |> fn(_, sanitized)
+    |> Js.Promise.then_(isOk => Js.Promise.resolve(isOk ? None : Some(msg)))
+  };
+
+let externCompiler = (fn, msg, maybe, sanitized) =>
+  extern((classified, _) => fn(classified), msg, maybe, sanitized);
+
+let externString = (fn, msg, maybe, sanitized) => {
+  let handler =
+    fun
+    | Js.Json.JSONString(str) => fn(str, sanitized) |> Js.Promise.resolve
+    | _ => Js.Promise.resolve(false);
+  externCompiler(handler, msg, maybe, sanitized);
+};
+
+let externNumber = (fn, msg, maybe, sanitized) => {
+  let handler =
+    fun
+    | Js.Json.JSONNumber(n) => fn(n, sanitized) |> Js.Promise.resolve
+    | _ => Js.Promise.resolve(false);
+  externCompiler(handler, msg, maybe, sanitized);
+};
+
+let externArray = (fn, msg, maybe, sanitized) => {
+  let handler =
+    fun
+    | Js.Json.JSONArray(arr) => fn(arr, sanitized) |> Js.Promise.resolve
+    | _ => Js.Promise.resolve(false);
+  externCompiler(handler, msg, maybe, sanitized);
+};

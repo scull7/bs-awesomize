@@ -36,6 +36,52 @@ let expectPass = (title, testFn) =>
   );
 
 describe("Awesomize Validator", () => {
+  describe("externString", () => {
+    let isMoo = (str, _) => str == "moo";
+    let extern = Awesomize.Validator.externString(isMoo, "not_moo");
+    expectFail(
+      "should fail when the given function returns false",
+      () => extern(maybeString("not_moo"), empty),
+      "not_moo"
+    );
+    expectPass(
+      "should pass when the given function returns true",
+      () => extern(maybeString("moo"), empty)
+    );
+  });
+  describe("externNumber", () => {
+    let is7 = (n, _) => n == 7.0;
+    let extern = Awesomize.Validator.externNumber(is7, "not_seven");
+    expectFail(
+      "should fail when the given function returns false",
+      () => extern(maybeNumber(8.0), empty),
+      "not_seven"
+    );
+    expectPass(
+      "should pass when the given function returns true",
+      () => extern(maybeNumber(7.0), empty),
+    );
+  });
+  describe("externArray", () => {
+    let has42 = (a, _) => Belt_Array.some(a, (x) =>
+      switch(Js.Json.classify(x)) {
+        | Js.Json.JSONNumber(n) => n == 42.0
+        | _ => false
+      }
+    );
+    let extern = Awesomize.Validator.externArray(has42, "missing_42");
+    let goodArray = Some(Js.Json.array([|Js.Json.number(42.0)|]));
+    let badArray = Some(Js.Json.array([||]));
+    expectFail(
+      "should fail when the given function returns false",
+      () => extern(badArray, empty),
+      "missing_42"
+    );
+    expectPass(
+      "should pass when the given function returns true",
+      () => extern(goodArray, empty),
+    );
+  });
   describe("externRaw", () => {
     let isFoo = (maybe, _) => switch(maybe) {
       | None => true
