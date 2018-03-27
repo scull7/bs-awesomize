@@ -1,3 +1,34 @@
+type maybe = option(Js.Json.t);
+
+type sanitized = Belt.Map.String.t(maybe);
+
+module Compile = {
+  let classified = (fn, maybe, sanitized: sanitized) =>
+    (
+      switch (maybe) {
+      | None => None
+      | Some(json) => json |> Js.Json.classify |> fn(_, sanitized)
+      }
+    )
+    |> Js.Promise.resolve;
+  let numberTest = (fn, maybe, sanitized: sanitized) => {
+    let fn2 = (classified, _) =>
+      switch (classified) {
+      | Js.Json.JSONNumber(n) => fn(n)
+      | _ => Some("not_number")
+      };
+    classified(fn2, maybe, sanitized);
+  };
+  let stringTest = (fn, maybe, sanitized) => {
+    let fn2 = (classified, _) =>
+      switch (classified) {
+      | Js.Json.JSONString(str) => fn(str)
+      | _ => Some("not_string")
+      };
+    classified(fn2, maybe, sanitized);
+  };
+};
+
 let required = (maybe, _) =>
   (
     switch (maybe) {
@@ -11,64 +42,49 @@ let requireArray = (maybe, _) =>
   (
     switch (maybe) {
     | None => Some("required")
-    | Some(Js.Json.JSONArray(_)) => None
-    | Some(_) => Some("require_array")
-    }
-  )
-  |> Js.Promise.resolve;
-
-let notEqualNumber = (x, maybe, _) =>
-  (
-    switch (maybe) {
-    | None => None
-    | Some(Js.Json.JSONNumber(number)) =>
-      x == number ? Some("cannot_be_equal") : None
-    | Some(_) => None
-    }
-  )
-  |> Js.Promise.resolve;
-
-let notEqualString = (x, maybe, _) =>
-  (
-    switch (maybe) {
-    | None => None
-    | Some(Js.Json.JSONString(string)) =>
-      x == string ? Some("cannot_be_equal") : None
-    | Some(_) => None
-    }
-  )
-  |> Js.Promise.resolve;
-
-let notEqual = (x, maybe, sanitized) =>
-  (
-    switch (Js.Json.classify(x)) {
-    | Js.Json.JSONNumber(number) => notEqualNumber(number, maybe, sanitized)
-    | Js.Json.JSONString(string) => notEqualString(string, maybe, sanitized)
-    | _ => failwith("invalid_arg")
-    }
-  )
-  |> Js.Promise.resolve;
-
-let isString = (maybe, _) =>
-  (
-    switch (maybe) {
-    | None => None
-    | Some(Js.Json.JSONString(_)) => None
-    | Some(_) => Some("not_string")
-    }
-  )
-  |> Js.Promise.resolve;
-
-let isInt = (maybe, _) =>
-  (
-    switch (maybe) {
-    | None => None
-    | Some(x) =>
-      switch (Js.Json.classify(x)) {
-      | Js.Json.JSONNumber(number) =>
-        Js.Math.ceil_float(number) == number ? None : Some("not_int")
-      | _ => Some("not_int")
+    | Some(json) =>
+      switch (Js.Json.classify(json)) {
+      | Js.Json.JSONArray(_) => None
+      | _ => Some("require_array")
       }
     }
   )
   |> Js.Promise.resolve;
+
+let notEqualNumber = x =>
+  Compile.numberTest(str => str == x ? Some("cannot_be_equal") : None);
+
+let notEqualString = x =>
+  Compile.stringTest(str => str == x ? Some("cannot_be_equal") : None);
+
+let isString =
+  Compile.classified((classified, _) =>
+    switch (classified) {
+    | Js.Json.JSONString(_) => None
+    | _ => Some("not_string")
+    }
+  );
+
+let isInt =
+  Compile.numberTest(n =>
+    Js.Math.ceil_float(n) == n ? None : Some("not_int")
+  );
+
+let isEqualNumber = x =>
+  Compile.numberTest(n => n == x ? None : Some("not_equal"));
+
+let isEqualString = x =>
+  Compile.stringTest(str => str == x ? None : Some("not_equal"));
+
+let externRaw = (fn, msg, maybe, sanitized) =>
+  fn(maybe, sanitized)
+  |> Js.Promise.resolve
+  |> Js.Promise.then_(isOk =>
+       (
+         switch (isOk) {
+         | false => Some(msg)
+         | true => None
+         }
+       )
+       |> Js.Promise.resolve
+     );
