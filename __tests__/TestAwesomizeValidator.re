@@ -42,11 +42,16 @@ describe("Awesomize Validator", () => {
     expectFail(
       "should fail when the given function returns false",
       () => extern(maybeString("not_moo"), empty),
-      "not_moo"
+      "not_moo",
     );
-    expectPass(
-      "should pass when the given function returns true",
-      () => extern(maybeString("moo"), empty)
+    expectFail(
+      "should fail when given a non-string value",
+      () => extern(maybeNumber(42.0), empty),
+      "not_moo",
+    );
+    expectPass("should pass when given a None", () => extern(None, empty));
+    expectPass("should pass when the given function returns true", () =>
+      extern(maybeString("moo"), empty)
     );
   });
   describe("externNumber", () => {
@@ -55,73 +60,94 @@ describe("Awesomize Validator", () => {
     expectFail(
       "should fail when the given function returns false",
       () => extern(maybeNumber(8.0), empty),
-      "not_seven"
+      "not_seven",
     );
-    expectPass(
-      "should pass when the given function returns true",
-      () => extern(maybeNumber(7.0), empty),
+    expectFail(
+      "should fail when given a non-number input",
+      () => extern(maybeString("fail"), empty),
+      "not_seven",
+    );
+    expectPass("should pass when the given function returns true", () =>
+      extern(maybeNumber(7.0), empty)
     );
   });
   describe("externArray", () => {
-    let has42 = (a, _) => Belt_Array.some(a, (x) =>
-      switch(Js.Json.classify(x)) {
+    let has42 = (a, _) =>
+      Belt_Array.some(a, x =>
+        switch (Js.Json.classify(x)) {
         | Js.Json.JSONNumber(n) => n == 42.0
         | _ => false
-      }
-    );
+        }
+      );
     let extern = Awesomize.Validator.externArray(has42, "missing_42");
     let goodArray = Some(Js.Json.array([|Js.Json.number(42.0)|]));
     let badArray = Some(Js.Json.array([||]));
     expectFail(
       "should fail when the given function returns false",
       () => extern(badArray, empty),
-      "missing_42"
+      "missing_42",
     );
-    expectPass(
-      "should pass when the given function returns true",
-      () => extern(goodArray, empty),
+    expectFail(
+      "should fail when a non array is given",
+      () => extern(maybeNumber(42.0), empty),
+      "missing_42",
+    );
+    expectPass("should pass when the given function returns true", () =>
+      extern(goodArray, empty)
     );
   });
   describe("externRaw", () => {
-    let isFoo = (maybe, _) => switch(maybe) {
+    let isFoo = (maybe, _) =>
+      switch (maybe) {
       | None => true
       | Some(json) =>
-        switch(json |> Js.Json.classify) {
-          | Js.Json.JSONString(str) => str == "foo"
-          | _ => false
+        switch (json |> Js.Json.classify) {
+        | Js.Json.JSONString(str) => str == "foo"
+        | _ => false
         }
-    };
+      };
     let extern = Awesomize.Validator.externRaw(isFoo, "failed");
     expectFail(
       "should fail when the given function return false",
       () => extern(maybeString("not_foo"), empty),
-      "failed"
+      "failed",
     );
-    expectPass(
-      "should pass when the given function returns true",
-      () => extern(maybeString("foo"), empty)
+    expectPass("should pass when the given function returns true", () =>
+      extern(maybeString("foo"), empty)
     );
   });
   describe("required", () => {
     expectFail(
       "should fail when the value is not present",
       () => Awesomize.Validator.required(None, empty),
-      "required"
+      "required",
     );
-    expectPass(
-      "should pass when the value is present",
-      () => Awesomize.Validator.required(maybeString("foo"), empty)
+    expectPass("should pass when the value is present", () =>
+      Awesomize.Validator.required(maybeString("foo"), empty)
     );
   });
   describe("requireArray", () => {
     expectFail(
       "should fail when the value is not an array",
       () => Awesomize.Validator.requireArray(maybeString("moo"), empty),
-      "require_array"
+      "require_array",
     );
-    expectPass(
-      "should pass when given an array",
-      () => Awesomize.Validator.requireArray(Some(Js.Json.array([||])), empty)
+    expectFail(
+      "should fail when given None",
+      () => Awesomize.Validator.requireArray(None, empty),
+      "required",
+    );
+    expectFail(
+      "should fail when given a boolean",
+      () =>
+        Awesomize.Validator.requireArray(
+          Some(Js.Json.boolean(Js.true_)),
+          empty,
+        ),
+      "require_array",
+    );
+    expectPass("should pass when given an array", () =>
+      Awesomize.Validator.requireArray(Some(Js.Json.array([||])), empty)
     );
   });
   describe("isEqualString", () => {
@@ -134,7 +160,7 @@ describe("Awesomize Validator", () => {
     expectFail(
       "should fail when given a number",
       () => isFoo(maybeNumber(42.0), empty),
-      "not_string"
+      "not_string",
     );
     expectPass("should pass when given equal strings", () =>
       isFoo(maybeString("foo"), empty)
@@ -148,9 +174,14 @@ describe("Awesomize Validator", () => {
       "cannot_be_equal",
     );
     expectFail(
+      "should fail when given a boolean",
+      () => notThing(Some(Js.Json.boolean(Js.true_)), empty),
+      "not_string",
+    );
+    expectFail(
       "should fail when given a number",
       () => notThing(maybeNumber(42.0), empty),
-      "not_string"
+      "not_string",
     );
     expectPass("should pass when given a non equal string", () =>
       notThing(maybeString("thing2"), empty)
@@ -166,7 +197,7 @@ describe("Awesomize Validator", () => {
     expectFail(
       "should fail when given a non-numeric value",
       () => is42(maybeString("NaN"), empty),
-      "not_number"
+      "not_number",
     );
     expectPass("should pass when given an equal number", () =>
       is42(maybeNumber(42.0), empty)
@@ -180,10 +211,16 @@ describe("Awesomize Validator", () => {
       "cannot_be_equal",
     );
     expectFail(
+      "should fail when given a boolean",
+      () => not42(Some(Js.Json.boolean(Js.true_)), empty),
+      "not_number",
+    );
+    expectFail(
       "should fail when given a non-numeric value",
       () => not42(maybeString("NaN"), empty),
-      "not_number"
+      "not_number",
     );
+    expectPass("should pass when given None", () => not42(None, empty));
     expectPass("should pass when given a non equal number", () =>
       not42(maybeNumber(43.0), empty)
     );
@@ -207,6 +244,12 @@ describe("Awesomize Validator", () => {
     expectFail(
       "should fail when given a float",
       () => Awesomize.Validator.isString(maybeNumber(42.0), empty),
+      "not_string",
+    );
+    let failBool = Some(Js.Json.boolean(Js.true_));
+    expectFail(
+      "should fail when giving a boolean",
+      () => Awesomize.Validator.isString(failBool, empty),
       "not_string",
     );
     expectPass("should pass when given a string", () =>
