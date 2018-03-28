@@ -12,6 +12,7 @@ type validate = (maybe, sanitized) => Js.Promise.t(option(string));
 
 type normalize = (maybe, sanitized) => Js.Promise.t(maybe);
 
+[@bs.deriving jsConverter]
 type definition = {
   read,
   sanitize: option(sanitize),
@@ -27,8 +28,35 @@ type resultMap = Belt.Map.String.t(Js.Json.t);
 
 type schema = Js.Array.t((string, definition));
 
+type jsInput =
+  Js.Array.t(
+    (
+      string,
+      {
+        .
+        "read":
+          Js.Dict.t(Js.Json.t) => Js.Promise.t(Js.Nullable.t(Js.Json.t)),
+        "sanitize":
+          Js.Nullable.t(
+            (. Js.Json.t, sanitized) =>
+            Js.Promise.t(Js.Nullable.t(Js.Json.t)),
+          ),
+        "validate": Js.Array.t(validate),
+        "normalize":
+          Js.Nullable.t(
+            (. Js.Json.t, sanitized) =>
+            Js.Promise.t(Js.Nullable.t(Js.Json.t)),
+          ),
+      },
+    ),
+  );
+
 let make:
   (schema, Js.Dict.t(Js.Json.t)) =>
+  Js.Promise.t([> | `Error(errorMap) | `Ok(resultMap)]);
+
+let fromJs:
+  (jsInput, Js.Dict.t(Js.Json.t)) =>
   Js.Promise.t([> | `Error(errorMap) | `Ok(resultMap)]);
 
 module Read = Awesomize_read;

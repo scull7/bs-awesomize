@@ -12,6 +12,7 @@ type validate = (maybe, sanitized) => Js.Promise.t(option(string));
 
 type normalize = (maybe, sanitized) => Js.Promise.t(maybe);
 
+[@bs.deriving jsConverter]
 type definition = {
   read,
   sanitize: option(sanitize),
@@ -120,6 +121,65 @@ module Validate = {
   };
 };
 
+module JavaScript = {
+  type nullable = Js.Nullable.t(Js.Json.t);
+  type current = Belt.Map.String.t(maybe);
+  type t =
+    Js.Array.t(
+      (
+        string,
+        {
+          .
+          "read":
+            Js.Dict.t(Js.Json.t) => Js.Promise.t(Js.Nullable.t(Js.Json.t)),
+          "sanitize":
+            Js.Nullable.t((. Js.Json.t, current) => Js.Promise.t(nullable)),
+          "validate": Js.Array.t(validate),
+          "normalize":
+            Js.Nullable.t((. Js.Json.t, current) => Js.Promise.t(nullable)),
+        },
+      ),
+    );
+  let convertRead = (read, json) =>
+    read(json)
+    |> Js.Promise.then_(result =>
+         Js.Nullable.toOption(result) |> Js.Promise.resolve
+       );
+  let convertScrubber = scrubber =>
+    switch (Js.Nullable.toOption(scrubber)) {
+    | None => None
+    | Some(fn) =>
+      Some(
+        (
+          (maybe, parsed) =>
+            switch (maybe) {
+            | None => Js.Promise.resolve(None)
+            | Some(json) =>
+              fn(. json, parsed)
+              |> Js.Promise.then_(result =>
+                   Js.Nullable.toOption(result) |> Js.Promise.resolve
+                 )
+            }
+        ),
+      )
+    };
+  let inputConvert = (input: t) : array((string, definition)) =>
+    Array.map(
+      ((key, def)) => (
+        key,
+        {
+          read: convertRead(def##read),
+          sanitize: convertScrubber(def##sanitize),
+          validate: Belt.List.ofArray(def##validate),
+          normalize: convertScrubber(def##normalize),
+        },
+      ),
+      input,
+    );
+};
+
+type jsInput = JavaScript.t;
+
 module Awesomize = {
   open Js.Promise;
   let make = array => {
@@ -161,6 +221,8 @@ module Awesomize = {
 };
 
 let make = Awesomize.make;
+
+let fromJs = input => input |> JavaScript.inputConvert |> Awesomize.make;
 
 module Read = Awesomize_read;
 
