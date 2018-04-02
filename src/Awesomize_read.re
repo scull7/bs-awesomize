@@ -1,14 +1,16 @@
 let key = (key, input) => Js.Dict.get(input, key) |> Js.Promise.resolve;
 
-let path = (path, input) =>
-  Belt_List.reduce(path, input, (found, key) =>
-    switch (found) {
-    | None => None
+let rec path = (list, input) =>
+  switch (list) {
+  | [] => failwith("Path must have at least one item")
+  | [key] => Js.Dict.get(input, key) |> Js.Promise.resolve
+  | [key, ...xs] =>
+    switch (Js.Dict.get(input, key)) {
+    | None => None |> Js.Promise.resolve
     | Some(thing) =>
       switch (thing |> Js.Json.classify) {
-      | Js.Json.JSONObject(dict) => Js.Dict.get(dict, key)
-      | _ => None
+      | Js.Json.JSONObject(dict) => path(xs, dict)
+      | _ => None |> Js.Promise.resolve
       }
     }
-  )
-  |> Js.Promise.resolve;
+  };
