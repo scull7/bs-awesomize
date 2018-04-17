@@ -126,7 +126,7 @@ let externArray = (fn, msg, maybe, sanitized) => {
   externCompiler(handler, msg, maybe, sanitized);
 };
 
-let recursive = (validator) => {
+let recursive = validator => {
   let rec awesomizer = jsonList =>
     switch (jsonList) {
     | [] => Js.Promise.resolve(true)
@@ -143,7 +143,6 @@ let recursive = (validator) => {
       | _ => Js.Promise.resolve(false)
       }
     };
-
   extern(
     (taggedJson, _) =>
       switch (taggedJson) {
