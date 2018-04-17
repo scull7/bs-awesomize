@@ -256,4 +256,46 @@ describe("Awesomize Validator", () => {
       Awesomize.Validator.isString(maybeString("moo"), empty)
     );
   });
+  describe("recursive", () => {
+    let schema = Awesomize.make([|
+      ( "valid",
+        { read: Awesomize.Read.key("valid"),
+          sanitize: None,
+          validate: [
+            Awesomize.Validator.required,
+            Awesomize.Validator.isString,
+          ],
+          normalize: None,
+        },
+      ),
+    |]);
+    let constructJson = (input) =>
+      input
+      |> Js.Dict.fromList
+      |> (x) => [| x |]
+      |> Js.Json.objectArray
+      |> (x) => Some(x);
+    testPromise("should pass when everything in the schema maps to the input", () => {
+      let input = [("valid", Js.Json.string("thing"))];
+      Awesomize.Validator.recursive(schema, constructJson(input), empty)
+      |> Js.Promise.then_(result => {
+           switch(result) {
+             | Some(msg) => fail(msg)
+             | None => pass
+           }
+           |> Js.Promise.resolve
+         })
+    });
+    testPromise("should fail when something in the schema does not map to the input", () => {
+      let input = [("invalid", Js.Json.string("thing"))];
+      Awesomize.Validator.recursive(schema, constructJson(input), empty)
+      |> Js.Promise.then_(result => {
+           switch(result) {
+             | Some(msg) => Expect.toBe("invalid_scope") @@ Expect.expect(msg)
+             | None => fail("should not pass validation")
+           }
+           |> Js.Promise.resolve
+         })
+    });
+  });
 });
