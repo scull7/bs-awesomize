@@ -125,3 +125,30 @@ let externArray = (fn, msg, maybe, sanitized) => {
     | _ => Js.Promise.resolve(false);
   externCompiler(handler, msg, maybe, sanitized);
 };
+
+let recursive = validator => {
+  let rec awesomizer = jsonList =>
+    switch (jsonList) {
+    | [] => Js.Promise.resolve(true)
+    | [x, ...xs] =>
+      switch (x |> Js.Json.classify) {
+      | Js.Json.JSONObject(dict) =>
+        validator(dict)
+        |> Js.Promise.then_(result =>
+             switch (result) {
+             | `Error(_) => Js.Promise.resolve(false)
+             | `Ok(_) => awesomizer(xs)
+             }
+           )
+      | _ => Js.Promise.resolve(false)
+      }
+    };
+  extern(
+    (taggedJson, _) =>
+      switch (taggedJson) {
+      | Js.Json.JSONArray(a) => a |> Belt_List.ofArray |> awesomizer
+      | _ => Js.Promise.resolve(false)
+      },
+    "invalid_scope",
+  );
+};
