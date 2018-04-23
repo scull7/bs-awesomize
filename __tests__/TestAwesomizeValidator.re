@@ -141,7 +141,7 @@ describe("Awesomize Validator", () => {
       "should fail when given a boolean",
       () =>
         Awesomize.Validator.requireArray(
-          Some(Js.Json.boolean(Js.true_)),
+          Some(Js.Json.boolean(true)),
           empty,
         ),
       "require_array",
@@ -175,7 +175,7 @@ describe("Awesomize Validator", () => {
     );
     expectFail(
       "should fail when given a boolean",
-      () => notThing(Some(Js.Json.boolean(Js.true_)), empty),
+      () => notThing(Some(Js.Json.boolean(true)), empty),
       "not_string",
     );
     expectFail(
@@ -212,7 +212,7 @@ describe("Awesomize Validator", () => {
     );
     expectFail(
       "should fail when given a boolean",
-      () => not42(Some(Js.Json.boolean(Js.true_)), empty),
+      () => not42(Some(Js.Json.boolean(true)), empty),
       "not_number",
     );
     expectFail(
@@ -246,7 +246,7 @@ describe("Awesomize Validator", () => {
       () => Awesomize.Validator.isString(maybeNumber(42.0), empty),
       "not_string",
     );
-    let failBool = Some(Js.Json.boolean(Js.true_));
+    let failBool = Some(Js.Json.boolean(true));
     expectFail(
       "should fail when giving a boolean",
       () => Awesomize.Validator.isString(failBool, empty),
