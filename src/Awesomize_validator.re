@@ -146,7 +146,7 @@ let recursive = validator => {
   extern(
     (taggedJson, _) =>
       switch (taggedJson) {
-      | Js.Json.JSONArray(a) => a |> Belt_List.ofArray |> awesomizer
+      | Js.Json.JSONArray(a) => a |> Belt_List.fromArray |> awesomizer
       | _ => Js.Promise.resolve(false)
       },
     "invalid_scope",

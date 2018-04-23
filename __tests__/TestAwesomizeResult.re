@@ -9,7 +9,7 @@ describe("Awesomize Result", () => {
       Expect.expect(actual) |> Expect.toBe(expected);
     });
     test("getMessage on an empty key", () => {
-      let result = Belt.Map.String.ofArray([|("test", None)|]);
+      let result = Belt.Map.String.fromArray([|("test", None)|]);
       let actual = Awesomize.Result.Error.getMessage("test", result);
       let expected = None;
       Expect.expect(actual) |> Expect.toBe(expected);

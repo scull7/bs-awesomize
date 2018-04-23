@@ -39,7 +39,7 @@ module Compiler = {
       Belt_Array.map(step, fn => fn(input))
       |> Js.Promise.all
       |> Js.Promise.then_(res =>
-           Belt.Map.String.ofArray(res) |> Js.Promise.resolve
+           Belt.Map.String.fromArray(res) |> Js.Promise.resolve
          );
   };
   let resolver = (key, value) => (key, value) |> Js.Promise.resolve;
@@ -170,7 +170,7 @@ module JavaScript = {
         {
           read: convertRead(def##read),
           sanitize: convertScrubber(def##sanitize),
-          validate: Belt.List.ofArray(def##validate),
+          validate: Belt.List.fromArray(def##validate),
           normalize: convertScrubber(def##normalize),
         },
       ),
@@ -183,7 +183,7 @@ type jsInput = JavaScript.t;
 module Awesomize = {
   open Js.Promise;
   let make = array => {
-    let definitionMap = Belt.Map.String.ofArray(array);
+    let definitionMap = Belt.Map.String.fromArray(array);
     let read = Reader.compiler(definitionMap);
     let sanitize = Sanitize.compiler(definitionMap);
     let validate = Validate.compiler(definitionMap);

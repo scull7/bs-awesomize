@@ -9,7 +9,7 @@ let data =
       toJsonObj([("bar", toJsonObj([("cow", Js.Json.string("moo"))]))]),
     ),
     ("bar", toJsonObj([("baz", Js.Json.string("moo"))])),
-    ("baz", Js.Json.boolean(Js.true_)),
+    ("baz", Js.Json.boolean(true)),
   ]);
 
 describe("Awesomize.Read", () =>
