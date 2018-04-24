@@ -52,15 +52,15 @@ describe("Awesomize Sanitize", () => {
     schema2(
       [|("test", Js.Json.string("crazy_thing"))|] |> Js.Dict.fromArray,
     )
-    |> Awesomize.Result.fold(
+    |> Result.Promise.fold(
          err => {
            Js.log2("Awesome Sanitize:1 - ", err);
-           "fail_err";
+           "fail_err" |> Js.Promise.resolve;
          },
          res =>
            switch (Belt.Map.String.get(res, "test2")) {
-           | None => "fail"
-           | Some(x) => parseString(x)
+           | None => "fail" |> Js.Promise.resolve
+           | Some(x) => parseString(x) |> Js.Promise.resolve
            },
        )
     |> Js.Promise.then_(result =>
@@ -69,15 +69,15 @@ describe("Awesomize Sanitize", () => {
   );
   testPromise("Sanitize should run when the value exists", () =>
     schema([|("test", Js.Json.string("moo"))|] |> Js.Dict.fromArray)
-    |> Awesomize.Result.fold(
+    |> Result.Promise.fold(
          err => {
            Js.log2("Awesome Sanitize:1 - ", err);
-           (-1.0);
+           (-1.0) |> Js.Promise.resolve;
          },
          res =>
            switch (Belt.Map.String.get(res, "test")) {
-           | None => (-2.0)
-           | Some(x) => parseNumber(x)
+           | None => (-2.0) |> Js.Promise.resolve
+           | Some(x) => parseNumber(x) |> Js.Promise.resolve
            },
        )
     |> Js.Promise.then_(result =>
@@ -102,12 +102,12 @@ describe("Awesomize Sanitize", () => {
         ),
       |]);
     schema([||] |> Js.Dict.fromArray)
-    |> Awesomize.Result.fold(
+    |> Result.Promise.fold(
          err => {
            Js.log2("Awesomize Sanitize:2 - ", err);
-           (-1.0);
+           Js.Promise.resolve(-1.0)
          },
-         _res => 42.0,
+         _res => Js.Promise.resolve(42.0),
        )
     |> Js.Promise.then_(result =>
          Expect.expect(result) |> Expect.toBe(42.0) |> Js.Promise.resolve

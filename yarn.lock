@@ -500,6 +500,10 @@ bs-platform@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/bs-platform/-/bs-platform-3.0.0.tgz#38f200730db52fdea37819376b6ac3dfb20244c0"
 
+bs-result@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/bs-result/-/bs-result-1.0.0.tgz#ac163e1384e1529d5f68e1caee16c65ebeb70a98"
+
 bser@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/bser/-/bser-2.0.0.tgz#9ac78d3ed5d915804fd87acb158bc797147a1719"

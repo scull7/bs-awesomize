@@ -29,6 +29,7 @@
     "ramda": "^0.25.0"
   },
   "dependencies": {
-    "bs-platform": "^3.0.0"
+    "bs-platform": "^3.0.0",
+    "bs-result": "^1.0.0"
   }
 }

@@ -43,11 +43,11 @@ describe("Awesomize", () => {
   testPromise("Should return an error for the missing bar element", () => {
     let input = [|("foo", Js.Json.string("thing"))|] |> Js.Dict.fromArray;
     schema(input)
-    |> Awesomize.Result.fold(
+    |> Result.Promise.fold(
          err => [|
            Belt.Map.String.get(err, "foo"),
            Belt.Map.String.get(err, "bar"),
-         |],
+         |] |> Js.Promise.resolve,
          _res => failwith("unexpected_success"),
        )
     |> Js.Promise.then_(result =>
@@ -56,5 +56,4 @@ describe("Awesomize", () => {
          |> Js.Promise.resolve
        );
   });
-  ();
 });
