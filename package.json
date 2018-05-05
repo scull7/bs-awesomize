@@ -16,7 +16,7 @@
   "author": "Nathan Sculli <scull7@gmail.com>",
   "license": "MIT",
   "peerDependencies": {
-    "bs-platform": "^2.2.3"
+    "bs-platform": "^3.0.0"
   },
   "devDependencies": {
     "@glennsl/bs-jest": "^0.4.2",
@@ -28,7 +28,5 @@
     "nyc": "^11.6.0",
     "ramda": "^0.25.0"
   },
-  "dependencies": {
-    "bs-platform": "^3.0.0"
-  }
+  "dependencies": {}
 }

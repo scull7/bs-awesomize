@@ -34,6 +34,9 @@ exports.compile = function compile (schema) {
   };
 }
 
+Validate.extern = Validate.JavaScript[1];
+Validate.externDependent = Validate.JavaScript[2];
+
 exports.make = Awesomize.make;
 exports.Normalize = Scrubber;
 exports.Read = Read;

@@ -116,6 +116,206 @@ describe("Awesomize Validator", () => {
       extern(maybeString("foo"), empty)
     );
   });
+  describe("externDependentNumber", () => {
+    let isGreater = (target, dependent, _) =>
+      Belt.Option.mapWithDefault(dependent, false, x => target > x)
+      |> Js.Promise.resolve;
+    expectFail(
+      "should fail when the dependent value is greater than the target",
+      () => {
+        let validator =
+          Awesomize.Validator.externDependentNumber(
+            isGreater,
+            "minimum",
+            "not_match",
+          );
+        let sanitized =
+          [|
+            ("minimum", Some(Js.Json.number(43.0))),
+            ("maximum", Some(Js.Json.number(42.0))),
+          |]
+          |> Belt.Map.String.fromArray;
+        validator(Some(Js.Json.number(42.0)), sanitized);
+      },
+      "not_match",
+    );
+    expectFail(
+      "should fail when the dependent value is not present",
+      () => {
+        let validator =
+          Awesomize.Validator.externDependentNumber(
+            isGreater,
+            "minimum",
+            "not_match",
+          );
+        let sanitized =
+          [|("minimum", None), ("maximum", Some(Js.Json.number(42.0)))|]
+          |> Belt.Map.String.fromArray;
+        validator(Some(Js.Json.number(42.0)), sanitized);
+      },
+      "not_match",
+    );
+    expectPass(
+      "should pass when the dependent value is less than the target", () => {
+      let validator =
+        Awesomize.Validator.externDependentNumber(
+          isGreater,
+          "minimum",
+          "not_match",
+        );
+      let sanitized =
+        [|
+          ("minimum", Some(Js.Json.number(42.0))),
+          ("maximum", Some(Js.Json.number(43.0))),
+        |]
+        |> Belt.Map.String.fromArray;
+      validator(Some(Js.Json.number(43.0)), sanitized);
+    });
+  });
+  describe("externDependentRaw", () => {
+    let notEqual = (target, dependent, _) =>
+      switch( target |> Js.Json.decodeNumber) {
+      | None => false
+      | Some(num) =>
+          Belt.Option.flatMap(dependent, Js.Json.decodeNumber)
+          |> Belt.Option.map(_, x => x !== num)
+          |> Belt.Option.getWithDefault(_, false)
+      }
+      |> Js.Promise.resolve;
+
+    expectFail(
+      "should fail when the dependent value is not present",
+      () => {
+        let sanitized =
+          [|
+            ("this", Some(Js.Json.number(42.0))),
+            ("that", None),
+          |]
+          |> Belt.Map.String.fromArray;
+        Awesomize.Validator.externDependentRaw(
+          notEqual,
+          "that",
+          "should_not_match",
+          Some(Js.Json.number(42.0)),
+          sanitized,
+        )
+      },
+      "should_not_match",
+    );
+    expectFail(
+      "should fail when the dependent value is equal",
+      () => {
+        let sanitized =
+          [|
+            ("this", Some(Js.Json.number(42.0))),
+            ("that", Some(Js.Json.number(42.0))),
+          |]
+          |> Belt.Map.String.fromArray;
+        Awesomize.Validator.externDependentRaw(
+          notEqual,
+          "that",
+          "should_not_match",
+          Some(Js.Json.number(42.0)),
+          sanitized,
+        )
+      },
+      "should_not_match",
+    );
+    expectPass(
+      "should pass when the dependent value is not equal",
+      () => {
+        let sanitized =
+          [|
+            ("this", Some(Js.Json.number(42.0))),
+            ("that", Some(Js.Json.number(43.0))),
+          |]
+          |> Belt.Map.String.fromArray;
+        Awesomize.Validator.externDependentRaw(
+          notEqual,
+          "that",
+          "should_not_match",
+          Some(Js.Json.number(42.0)),
+          sanitized,
+        )
+      },
+    );
+    expectPass(
+      "should pass when the target value is not present",
+      () => {
+        let sanitized =
+          [|
+            ("this", Some(Js.Json.number(42.0))),
+            ("that", Some(Js.Json.number(43.0))),
+          |]
+          |> Belt.Map.String.fromArray;
+        Awesomize.Validator.externDependentRaw(
+          notEqual,
+          "that",
+          "should_not_match",
+          None,
+          sanitized,
+        )
+      },
+    );
+  });
+  describe("externDependentString", () => {
+    let passwordMatch = (target, dependent, _) =>
+      Belt.Option.mapWithDefault(dependent, false, x => target === x)
+      |> Js.Promise.resolve;
+    expectFail(
+      "should fail when the confirmation value is not present",
+      () => {
+        let validator =
+          Awesomize.Validator.externDependentString(
+            passwordMatch,
+            "confirm",
+            "not_match",
+          );
+        let sanitized =
+          [|
+            ("confirm", None),
+            ("password", Some(Js.Json.string("password"))),
+          |]
+          |> Belt.Map.String.fromArray;
+        validator(Some(Js.Json.string("password")), sanitized);
+      },
+      "not_match",
+    );
+    expectFail(
+      "should fail when the confirmation value does not match",
+      () => {
+        let validator =
+          Awesomize.Validator.externDependentString(
+            passwordMatch,
+            "confirm",
+            "not_match",
+          );
+        let sanitized =
+          [|
+            ("confirm", Some(Js.Json.string("not_password"))),
+            ("password", Some(Js.Json.string("password"))),
+          |]
+          |> Belt.Map.String.fromArray;
+        validator(Some(Js.Json.string("password")), sanitized);
+      },
+      "not_match",
+    );
+    expectPass("should pass when the confirmation value does match", () => {
+      let validator =
+        Awesomize.Validator.externDependentString(
+          passwordMatch,
+          "confirm",
+          "not_match",
+        );
+      let sanitized =
+        [|
+          ("confirm", Some(Js.Json.string("password"))),
+          ("password", Some(Js.Json.string("password"))),
+        |]
+        |> Belt.Map.String.fromArray;
+      validator(Some(Js.Json.string("password")), sanitized);
+    });
+  });
   describe("required", () => {
     expectFail(
       "should fail when the value is not present",
