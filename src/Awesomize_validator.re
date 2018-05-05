@@ -93,6 +93,11 @@ let isEqualNumber = x =>
 let isEqualString = x =>
   Compile.stringTest(str => str == x ? None : Some("not_equal"));
 
+let minStringLength = length =>
+  Compile.stringTest(str =>
+    String.length(str) >= length ? None : Some("min_length")
+  );
+
 let externRaw = (fn, msg, maybe, sanitized) =>
   fn(maybe, sanitized) |> Js.Promise.resolve |> reply(msg);
 
@@ -180,60 +185,59 @@ let recursive = validator => {
 };
 
 module JavaScript = {
-
   [@bs.scope "Promise"] [@bs.val]
   external jsResolve : 'a => Js.Promise.t('a) = "resolve";
-
   /*
-  let extractDependentValue =
-    fun
-    | None => Js.Nullable.null
-    | Some(v) => Js.Nullable.fromOption(v);
-    */
-
-  let extractDependentValue = (maybe) =>
-    Belt.Option.mapWithDefault(maybe, Js.Nullable.null, Js.Nullable.fromOption);
-
-
+   let extractDependentValue =
+     fun
+     | None => Js.Nullable.null
+     | Some(v) => Js.Nullable.fromOption(v);
+     */
+  let extractDependentValue = maybe =>
+    Belt.Option.mapWithDefault(
+      maybe,
+      Js.Nullable.null,
+      Js.Nullable.fromOption,
+    );
   module Promise = {
-    let extern = (. fn, msg) => (. maybe, sanitized) => {
-      Belt.Option.map(maybe, json => {
-        let jsonSanitized =
-          Belt.Map.String.map(sanitized,
-            fun
-            | None => Js.Json.null
-            | Some(v) => v
+    let extern =
+      (. fn, msg) =>
+        (. maybe, sanitized) =>
+          Belt.Option.map(
+            maybe,
+            json => {
+              let jsonSanitized =
+                Belt.Map.String.map(
+                  sanitized,
+                  fun
+                  | None => Js.Json.null
+                  | Some(v) => v,
+                )
+                |> Belt.Map.String.toArray
+                |> Js.Dict.fromArray
+                |> Js.Json.object_;
+              fn(json, jsonSanitized, sanitized);
+            },
           )
-          |> Belt.Map.String.toArray
-          |> Js.Dict.fromArray
-          |> Js.Json.object_;
-
-        fn(json, jsonSanitized, sanitized)
-      })
-      |> Belt.Option.getWithDefault(_, falsePromise)
-      |> reply(msg);
-    };
-
-    let externDependent = (. fn, key, msg) => {
-      let executor = (json, jsonSanitized, sanitized) =>
-        Belt.Map.String.get(sanitized, key)
-        |> extractDependentValue
-        |> fn(json, _, jsonSanitized);
-
-      extern(. executor, msg);
-    };
+          |> Belt.Option.getWithDefault(_, falsePromise)
+          |> reply(msg);
+    let externDependent =
+      (. fn, key, msg) => {
+        let executor = (json, jsonSanitized, sanitized) =>
+          Belt.Map.String.get(sanitized, key)
+          |> extractDependentValue
+          |> fn(json, _, jsonSanitized);
+        extern(. executor, msg);
+      };
   };
-
-  let extern = (. fn, msg) => Promise.extern(
-    .
-    (a, b, c) => fn(a, b, c) |> jsResolve,
-    msg
-  );
-  
-  let externDependent = (. fn, key, msg) => Promise.externDependent(
-    .
-    (a, b, c) => fn(a, b, c) |> jsResolve,
-    key,
-    msg,
-  );
+  let extern =
+    (. fn, msg) =>
+      Promise.extern(. (a, b, c) => fn(a, b, c) |> jsResolve, msg);
+  let externDependent =
+    (. fn, key, msg) =>
+      Promise.externDependent(.
+        (a, b, c) => fn(a, b, c) |> jsResolve,
+        key,
+        msg,
+      );
 };

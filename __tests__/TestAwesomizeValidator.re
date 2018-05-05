@@ -174,23 +174,21 @@ describe("Awesomize Validator", () => {
   });
   describe("externDependentRaw", () => {
     let notEqual = (target, dependent, _) =>
-      switch( target |> Js.Json.decodeNumber) {
-      | None => false
-      | Some(num) =>
+      (
+        switch (target |> Js.Json.decodeNumber) {
+        | None => false
+        | Some(num) =>
           Belt.Option.flatMap(dependent, Js.Json.decodeNumber)
           |> Belt.Option.map(_, x => x !== num)
           |> Belt.Option.getWithDefault(_, false)
-      }
+        }
+      )
       |> Js.Promise.resolve;
-
     expectFail(
       "should fail when the dependent value is not present",
       () => {
         let sanitized =
-          [|
-            ("this", Some(Js.Json.number(42.0))),
-            ("that", None),
-          |]
+          [|("this", Some(Js.Json.number(42.0))), ("that", None)|]
           |> Belt.Map.String.fromArray;
         Awesomize.Validator.externDependentRaw(
           notEqual,
@@ -198,7 +196,7 @@ describe("Awesomize Validator", () => {
           "should_not_match",
           Some(Js.Json.number(42.0)),
           sanitized,
-        )
+        );
       },
       "should_not_match",
     );
@@ -217,46 +215,40 @@ describe("Awesomize Validator", () => {
           "should_not_match",
           Some(Js.Json.number(42.0)),
           sanitized,
-        )
+        );
       },
       "should_not_match",
     );
-    expectPass(
-      "should pass when the dependent value is not equal",
-      () => {
-        let sanitized =
-          [|
-            ("this", Some(Js.Json.number(42.0))),
-            ("that", Some(Js.Json.number(43.0))),
-          |]
-          |> Belt.Map.String.fromArray;
-        Awesomize.Validator.externDependentRaw(
-          notEqual,
-          "that",
-          "should_not_match",
-          Some(Js.Json.number(42.0)),
-          sanitized,
-        )
-      },
-    );
-    expectPass(
-      "should pass when the target value is not present",
-      () => {
-        let sanitized =
-          [|
-            ("this", Some(Js.Json.number(42.0))),
-            ("that", Some(Js.Json.number(43.0))),
-          |]
-          |> Belt.Map.String.fromArray;
-        Awesomize.Validator.externDependentRaw(
-          notEqual,
-          "that",
-          "should_not_match",
-          None,
-          sanitized,
-        )
-      },
-    );
+    expectPass("should pass when the dependent value is not equal", () => {
+      let sanitized =
+        [|
+          ("this", Some(Js.Json.number(42.0))),
+          ("that", Some(Js.Json.number(43.0))),
+        |]
+        |> Belt.Map.String.fromArray;
+      Awesomize.Validator.externDependentRaw(
+        notEqual,
+        "that",
+        "should_not_match",
+        Some(Js.Json.number(42.0)),
+        sanitized,
+      );
+    });
+    expectPass("should pass when the target value is not present", () => {
+      let sanitized =
+        [|
+          ("this", Some(Js.Json.number(42.0))),
+          ("that", Some(Js.Json.number(43.0))),
+        |]
+        |> Belt.Map.String.fromArray;
+      Awesomize.Validator.externDependentRaw(
+        notEqual,
+        "that",
+        "should_not_match",
+        None,
+        sanitized,
+      );
+    });
   });
   describe("externDependentString", () => {
     let passwordMatch = (target, dependent, _) =>
@@ -454,6 +446,30 @@ describe("Awesomize Validator", () => {
     );
     expectPass("should pass when given a string", () =>
       Awesomize.Validator.isString(maybeString("moo"), empty)
+    );
+  });
+  describe("minStringLength", () => {
+    expectFail(
+      "should fail when given a string that does not meet the length requirement",
+      () => {
+        let validator = Awesomize.Validator.minStringLength(1);
+        validator(maybeString(""), empty);
+      },
+      "min_length",
+    );
+    expectPass(
+      "should pass when given a string that does meet the length requirement",
+      () => {
+        let validator = Awesomize.Validator.minStringLength(3);
+        validator(maybeString("moo"), empty);
+      }
+    );
+    expectPass(
+      "should pass when given an empty value",
+      () => {
+        let validator = Awesomize.Validator.minStringLength(3);
+        validator(None, empty);
+      }
     );
   });
   describe("recursive", () => {
