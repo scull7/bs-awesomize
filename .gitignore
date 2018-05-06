@@ -27,6 +27,5 @@ setup.log
 *.log
 .bsb.lock
 tests/test.data
-src/*.js
 __tests__/*.bs.js
 /coverage
