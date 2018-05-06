@@ -1,6 +1,6 @@
 {
   "name": "bs-awesomize",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "description": "A ReasonML implementation of the Awesomize validation and data scrubbing library.",
   "scripts": {
     "build": "bsb -make-world",
