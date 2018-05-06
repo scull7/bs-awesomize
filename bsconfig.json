@@ -1,6 +1,6 @@
 {
   "name": "bs-awesomize",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "package-specs": {
     "module": "commonjs",
     "in-source": true
