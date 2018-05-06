@@ -203,7 +203,6 @@ module JavaScript = {
     fun
     | None => Js.Json.null
     | Some(v) => v;
-
   module Promise = {
     let extern =
       (. fn, msg) =>
@@ -213,11 +212,10 @@ module JavaScript = {
             |> Belt.Map.String.toArray
             |> Js.Dict.fromArray
             |> Js.Json.object_;
-
           Belt.Option.map(maybe, json => fn(json, jsonSanitized, sanitized))
-          |> Belt.Option.getWithDefault(_, falsePromise)
-          |> reply(msg)
-          };
+          |> Belt.Option.getWithDefault(_, Js.Promise.resolve(true))
+          |> reply(msg);
+        };
     let externDependent =
       (. fn, key, msg) => {
         let executor = (json, jsonSanitized, sanitized) =>

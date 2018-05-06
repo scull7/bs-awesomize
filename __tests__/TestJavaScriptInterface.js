@@ -79,6 +79,16 @@ describe('Awesomize Validator JavaScript.extern', () => {
         done();
       });
   });
+  it("should pass when the target value is not present", (done) => {
+    schema({})
+
+      .then(result => {
+        expect(result.awesomeResultType).toBe('Ok');
+        expect(result.messages).toBeNull();
+        expect(result.data.foo).toBeUndefined();
+        done();
+      });
+  });
 });
 
 describe('Awesomize Validator JavaScript.externDependent', () => {

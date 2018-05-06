@@ -270,19 +270,21 @@ function recursive(validator) {
     });
 }
 
+function nullOrValue(param) {
+  if (param) {
+    return param[0];
+  } else {
+    return null;
+  }
+}
+
 function extern$1(fn, msg) {
   return (function (maybe, sanitized) {
+      var jsonSanitized = Js_dict.fromArray(Belt_MapString.toArray(Belt_MapString.map(sanitized, nullOrValue)));
       var __x = Belt_Option.map(maybe, (function (json) {
-              var jsonSanitized = Js_dict.fromArray(Belt_MapString.toArray(Belt_MapString.map(sanitized, (function (param) {
-                              if (param) {
-                                return param[0];
-                              } else {
-                                return null;
-                              }
-                            }))));
               return Curry._3(fn, json, jsonSanitized, sanitized);
             }));
-      return reply(msg, Belt_Option.getWithDefault(__x, falsePromise));
+      return reply(msg, Belt_Option.getWithDefault(__x, Promise.resolve(true)));
     });
 }
 
