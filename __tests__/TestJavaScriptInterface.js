@@ -62,6 +62,127 @@ describe('Awesomize interface to JavaScript', () => {
     });
 
   });
+
+  describe('Field definition validation', () => {
+    it('should throw when the schema is undefined', () => {
+      expect(() => Awesomize.compile())
+        
+        .toThrowError(
+          /^schema must be an 'object' received 'undefined'./
+        );
+    });
+    it('should throw when the schema is not an object', () => {
+      expect(() => Awesomize.compile(() => ({
+        'bad': {
+          read: ({ bad }) => bad,
+          sanitize: (x) => 'moo' + x,
+          validate: [ Awesomize.Validate.required ],
+          normalize: (x) => x + 'moo',
+        },
+      })))
+        
+        .toThrowError(
+          /^schema must be an 'object' received 'function'./
+        );
+    });
+    it('should throw when the definition is not an object', () => {
+      expect(() => Awesomize.compile({
+        'bad': () => ({
+          read: ({ bad }) => bad,
+          sanitize: (x) => 'moo' + x,
+          validate: [ Awesomize.Validate.required ],
+          normalize: (x) => x + 'moo',
+        }),
+      }))
+        
+        .toThrowError(
+          /^definition for 'bad' must be an 'object' received 'function'./
+        );
+    });
+    it('should throw when the definition is null', () => {
+      expect(() => Awesomize.compile({
+        'bad': null,
+      }))
+        
+        .toThrowError(
+          /^definition for 'bad' must be an 'object' received 'null'./
+        );
+    });
+    it('should throw when the validation property is not provided', () => {
+      expect(() => Awesomize.compile({
+        'bad': {
+          read: ({ bad }) => bad,
+          sanitize: (x) => x,
+        },
+      }))
+
+        .toThrowError(/^validate property is required for 'bad'./);
+    });
+
+    it('should throw when the validate property is not an array', () => {
+      expect(() => Awesomize.compile({
+        'bad': {
+          read: ({ bad }) => bad,
+          validate: Awesomize.Validate.required,
+          sanitize: (x) => x,
+        },
+      }))
+
+        .toThrowError(/^validate property for 'bad' must be an array./);
+    });
+
+    it('should throw when a validator is not a function', () => {
+      expect(() => Awesomize.compile({
+        'bad': {
+          read: ({ bad }) => bad,
+          validate: [ Awesomize.Validate.required, 'moo' ],
+          sanitize: (x) => x,
+        },
+      }))
+
+        .toThrowError(
+          /^validate property expects an Array<Function> received 'string' for 'bad' at index '1'/
+        );
+    });
+
+    it('should throw when the read property is not provided', () => {
+      expect(() => Awesomize.compile({
+        'bad': {
+          validate: [ Awesomize.Validate.required ],
+          sanitized: (x) => x,
+        },
+      }))
+
+        .toThrowError(/^read property is required for 'bad'./);
+    });
+
+    it('should throw when the sanitize property is not a function', () => {
+      expect(() => Awesomize.compile({
+        'bad': {
+          read: ({ bad }) => bad,
+          validate: [ Awesomize.Validate.required ],
+          sanitize: [ (x) => x ],
+        },
+      }))
+
+        .toThrowError(
+          /^sanitize property expects 'function' received 'object' for 'bad'./
+        );
+    });
+    it('should throw when the normalize property is not a function', () => {
+      expect(() => Awesomize.compile({
+        'bad': {
+          read: ({ bad }) => bad,
+          validate: [ Awesomize.Validate.required ],
+          normalize: 'moo',
+        },
+      }))
+
+        .toThrowError(
+          /^normalize property expects 'function' received 'string' for 'bad'./
+        );
+    });
+  });
 });
 
 describe('Awesomize Validator JavaScript.extern', () => {
