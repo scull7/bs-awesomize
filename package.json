@@ -11,13 +11,10 @@
     "test": "yarn run clean; yarn run build; jest --coverage && yarn run coverage",
     "watch:jest": "jest --coverage --watchAll"
   },
-  "main": "src/Awesomize.bs.js",
+  "main": "index.js",
   "repository": "git@github.com:scull7/bs-awesomize.git",
   "author": "Nathan Sculli <scull7@gmail.com>",
   "license": "MIT",
-  "peerDependencies": {
-    "bs-platform": "^3.0.0"
-  },
   "devDependencies": {
     "@glennsl/bs-jest": "^0.4.2",
     "awesomize": "^0.1.19",
@@ -28,5 +25,7 @@
     "nyc": "^11.6.0",
     "ramda": "^0.25.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "bs-platform": "^3.0.0"
+  }
 }
