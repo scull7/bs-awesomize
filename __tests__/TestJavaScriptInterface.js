@@ -42,6 +42,45 @@ describe('Awesomize interface to JavaScript', () => {
   });
 });
 
+describe('Awesomize Validator JavaScript.extern', () => {
+  const greaterThanFive = (x) => x > 5;
+
+  const validator = Awesomize.Validate.extern(
+    greaterThanFive,
+    "too_small"
+  );
+
+  let schema = Awesomize.compile({
+    "foo": {
+      read: ({ foo }) => foo,
+      sanitize: null,
+      validate: [ validator ],
+      normalize: null,
+    },
+  });
+  
+  it("should fail when the target value is less than five", (done) => {
+    schema({ foo: 2 })
+
+      .then(result => {
+        expect(result.awesomeResultType).toBe('Error');
+        expect(result.data).toBeNull();
+        expect(result.messages.foo).toBe("too_small");
+        done();
+      })
+  });
+  it("should pass when the target value is greater than five", (done) => {
+    schema({ foo: 42 })
+
+      .then(result => {
+        expect(result.awesomeResultType).toBe('Ok');
+        expect(result.messages).toBeNull();
+        expect(result.data.foo).toBe(42);
+        done();
+      });
+  });
+});
+
 describe('Awesomize Validator JavaScript.externDependent', () => {
   const notEqual = (target, dependent, _sanitized) => {
     if (dependent == null) {

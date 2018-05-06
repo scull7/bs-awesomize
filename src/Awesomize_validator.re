@@ -199,28 +199,25 @@ module JavaScript = {
       Js.Nullable.null,
       Js.Nullable.fromOption,
     );
+  let nullOrValue =
+    fun
+    | None => Js.Json.null
+    | Some(v) => v;
+
   module Promise = {
     let extern =
       (. fn, msg) =>
-        (. maybe, sanitized) =>
-          Belt.Option.map(
-            maybe,
-            json => {
-              let jsonSanitized =
-                Belt.Map.String.map(
-                  sanitized,
-                  fun
-                  | None => Js.Json.null
-                  | Some(v) => v,
-                )
-                |> Belt.Map.String.toArray
-                |> Js.Dict.fromArray
-                |> Js.Json.object_;
-              fn(json, jsonSanitized, sanitized);
-            },
-          )
+        (. maybe, sanitized) => {
+          let jsonSanitized =
+            Belt.Map.String.map(sanitized, nullOrValue)
+            |> Belt.Map.String.toArray
+            |> Js.Dict.fromArray
+            |> Js.Json.object_;
+
+          Belt.Option.map(maybe, json => fn(json, jsonSanitized, sanitized))
           |> Belt.Option.getWithDefault(_, falsePromise)
-          |> reply(msg);
+          |> reply(msg)
+          };
     let externDependent =
       (. fn, key, msg) => {
         let executor = (json, jsonSanitized, sanitized) =>

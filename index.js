@@ -34,7 +34,10 @@ exports.compile = function compile (schema) {
   };
 }
 
-Validate.extern = Validate.JavaScript[1];
+Validate.extern = (fn, msg) => {
+  const executor = (a, b, c) => fn(a, b, c);
+  return Validate.JavaScript[1](executor, msg);
+};
 Validate.externDependent = Validate.JavaScript[2];
 
 exports.make = Awesomize.make;
