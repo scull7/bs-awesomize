@@ -40,6 +40,28 @@ describe('Awesomize interface to JavaScript', () => {
         done();
       })
   });
+
+  describe('Sanitizer', () => {
+    const schema = Awesomize.compile({
+      'foo': {
+        read: ({ foo }) => foo,
+        sanitize: (x) => x,
+        validate: [ Awesomize.Validate.required ],
+      },
+    });
+
+    it('should resolve with the value', (done) => {
+      schema({ foo: 42 })
+
+        .then(result => {
+          expect(result.awesomeResultType).toBe('Ok');
+          expect(result.messages).toBeNull();
+          expect(result.data.foo).toBe(42);
+          done();
+        });
+    });
+
+  });
 });
 
 describe('Awesomize Validator JavaScript.extern', () => {
