@@ -178,6 +178,19 @@ function maxNumber(max) {
     });
 }
 
+function minNumber(min) {
+  return (function (param, param$1) {
+      return numberTest((function (n) {
+                    var match = n >= min;
+                    if (match) {
+                      return /* None */0;
+                    } else {
+                      return /* Some */["minimum"];
+                    }
+                  }), param, param$1);
+    });
+}
+
 function externRaw(fn, msg, maybe, sanitized) {
   return reply(msg, Promise.resolve(Curry._2(fn, maybe, sanitized)));
 }
@@ -359,6 +372,7 @@ exports.isString = isString;
 exports.minStringLength = minStringLength;
 exports.maxStringLength = maxStringLength;
 exports.maxNumber = maxNumber;
+exports.minNumber = minNumber;
 exports.notEqualNumber = notEqualNumber;
 exports.notEqualString = notEqualString;
 exports.recursive = recursive;

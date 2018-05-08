@@ -106,6 +106,9 @@ let maxStringLength = length =>
 let maxNumber = max =>
   Compile.numberTest(n => n <= max ? None : Some("maximum"));
 
+let minNumber = min =>
+  Compile.numberTest(n => n >= min ? None : Some("minimum"));
+
 let externRaw = (fn, msg, maybe, sanitized) =>
   fn(maybe, sanitized) |> Js.Promise.resolve |> reply(msg);
 

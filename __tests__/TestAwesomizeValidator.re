@@ -520,6 +520,30 @@ describe("Awesomize Validator", () => {
       }
     );
   });
+  describe("minNumber", () => {
+    expectFail(
+      "should fail when given a number which does not meet the minimum",
+      () => {
+        let validator = Awesomize.Validator.minNumber(3.0);
+        validator(maybeNumber(1.0), empty);
+      },
+      "minimum",
+    );
+    expectPass(
+      "should pass when given a number which is greater than the minimum",
+      () => {
+        let validator = Awesomize.Validator.minNumber(3.0);
+        validator(maybeNumber(4.0), empty);
+      }
+    );
+    expectPass(
+      "should pass when given an empty value",
+      () => {
+        let validator = Awesomize.Validator.minNumber(3.0);
+        validator(None, empty);
+      }
+    );
+  });
   describe("recursive", () => {
     let schema =
       Awesomize.make([|
