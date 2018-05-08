@@ -472,6 +472,30 @@ describe("Awesomize Validator", () => {
       }
     );
   });
+  describe("maxStringLength", () => {
+    expectFail(
+      "should fail when given a string that does not meet the length requirement",
+      () => {
+        let validator = Awesomize.Validator.maxStringLength(3);
+        validator(maybeString("test"), empty);
+      },
+      "max_length",
+    );
+    expectPass(
+      "should pass when given a string that does meet the length requirement",
+      () => {
+        let validator = Awesomize.Validator.maxStringLength(3);
+        validator(maybeString("moo"), empty);
+      }
+    );
+    expectPass(
+      "should pass when given an empty value",
+      () => {
+        let validator = Awesomize.Validator.maxStringLength(3);
+        validator(None, empty);
+      }
+    );
+  });
   describe("recursive", () => {
     let schema =
       Awesomize.make([|

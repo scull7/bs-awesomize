@@ -152,6 +152,19 @@ function minStringLength(length) {
     });
 }
 
+function maxStringLength(length) {
+  return (function (param, param$1) {
+      return stringTest((function (str) {
+                    var match = str.length <= length;
+                    if (match) {
+                      return /* None */0;
+                    } else {
+                      return /* Some */["max_length"];
+                    }
+                  }), param, param$1);
+    });
+}
+
 function externRaw(fn, msg, maybe, sanitized) {
   return reply(msg, Promise.resolve(Curry._2(fn, maybe, sanitized)));
 }
@@ -331,6 +344,7 @@ exports.isEqualString = isEqualString;
 exports.isInt = isInt;
 exports.isString = isString;
 exports.minStringLength = minStringLength;
+exports.maxStringLength = maxStringLength;
 exports.notEqualNumber = notEqualNumber;
 exports.notEqualString = notEqualString;
 exports.recursive = recursive;

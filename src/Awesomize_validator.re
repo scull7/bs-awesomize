@@ -98,6 +98,11 @@ let minStringLength = length =>
     String.length(str) >= length ? None : Some("min_length")
   );
 
+let maxStringLength = length =>
+  Compile.stringTest(str =>
+    String.length(str) <= length ? None : Some("max_length")
+  );
+
 let externRaw = (fn, msg, maybe, sanitized) =>
   fn(maybe, sanitized) |> Js.Promise.resolve |> reply(msg);
 
