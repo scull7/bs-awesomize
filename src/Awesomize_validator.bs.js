@@ -227,6 +227,8 @@ function matchRegex(re) {
     });
 }
 
+var isUSEIN = matchRegex((/^(0[1-6]|1[0-6]|2[0-7]|[345]\d|[68][0-8]|7[1-7]|9[0-58-9])-?\d{7}$/));
+
 function externRaw(fn, msg, maybe, sanitized) {
   return reply(msg, Promise.resolve(Curry._2(fn, maybe, sanitized)));
 }
@@ -406,6 +408,7 @@ exports.isEqualNumber = isEqualNumber;
 exports.isEqualString = isEqualString;
 exports.isInt = isInt;
 exports.isString = isString;
+exports.isUSEIN = isUSEIN;
 exports.matchRegex = matchRegex;
 exports.minStringLength = minStringLength;
 exports.maxStringLength = maxStringLength;

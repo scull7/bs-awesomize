@@ -85,6 +85,8 @@ let isInt: (maybe, sanitized) => result;
 
 let isString: (maybe, sanitized) => result;
 
+let isUSEIN: (maybe, sanitized) => result;
+
 let matchRegex: (Js.Re.t, maybe, sanitized) => result;
 
 let minStringLength: (int, maybe, sanitized) => result;

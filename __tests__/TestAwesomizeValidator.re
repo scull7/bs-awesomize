@@ -568,6 +568,48 @@ describe("Awesomize Validator", () => {
       }
     );
   });
+  describe("isUSEIN", () => {
+    expectFail(
+      "should fail when the string is not a valid EIN (too many chars)",
+      () => Awesomize.Validator.isUSEIN(maybeString("89-3456780"), empty),
+      "not_match",
+    );
+    expectFail(
+      "should fail when the string is not a valid EIN (not enough chars)",
+      () => Awesomize.Validator.isUSEIN(maybeString("89-345678"), empty),
+      "not_match",
+    );
+    expectFail(
+      "should fail when the string is not a valid EIN (invalid chars)",
+      () => Awesomize.Validator.isUSEIN(maybeString("892-34-5678"), empty),
+      "not_match",
+    );
+    expectFail(
+      "should fail when the string is not a valid EIN prefix (with-dash)",
+      () => Awesomize.Validator.isUSEIN(maybeString("89-2345678"), empty),
+      "not_match",
+    );
+    expectFail(
+      "should fail when the string is not a valid EIN prefix (no-dash)",
+      () => Awesomize.Validator.isUSEIN(maybeString("692345678"), empty),
+      "not_match",
+    );
+    expectPass(
+      "should pass when the string is a valid EIN (with-dash)",
+      () => Awesomize.Validator.isUSEIN(maybeString("99-2345678"), empty),
+    );
+    expectPass(
+      "should pass when the string is a valid EIN (no-dash)",
+      () => Awesomize.Validator.isUSEIN(maybeString("012345678"), empty),
+    );
+    expectPass(
+      "should pass when given an empty value",
+      () => {
+        let validator = Awesomize.Validator.matchRegex([%bs.re "/\\d+/"]);
+        validator(None, empty);
+      }
+    );
+  });
   describe("isBigInt", () => {
     expectFail(
       "should fail when the string is more than 20 digits",
