@@ -544,6 +544,67 @@ describe("Awesomize Validator", () => {
       }
     );
   });
+  describe("isBigInt", () => {
+    expectFail(
+      "should fail when the string is more than 20 digits",
+      () => Awesomize.Validator.isBigInt(
+        maybeString("184467440737095516157"),
+        empty
+      ),
+      "maximum",
+    );
+    expectFail(
+      "should fail when the string represents zero",
+      () => Awesomize.Validator.isBigInt(
+        maybeString("00000"),
+        empty
+      ),
+      "minimum",
+    );
+    expectFail(
+      "should fail when the string represents positive zero",
+      () => Awesomize.Validator.isBigInt(
+        maybeString("0"),
+        empty
+      ),
+      "minimum",
+    );
+    expectFail(
+      "should fail when the string represents negative zero",
+      () => Awesomize.Validator.isBigInt(
+        maybeString("-0"),
+        empty
+      ),
+      "minimum",
+    );
+    expectFail(
+      "should fail when the string represents a negative number",
+      () => Awesomize.Validator.isBigInt(
+        maybeString("-1234896323423434"),
+        empty
+      ),
+      "minimum",
+    );
+    expectFail(
+      "should fail when the string contains non digits",
+      () => Awesomize.Validator.isBigInt(
+        maybeString("84467440A37095516157"),
+        empty
+      ),
+      "not_big_int",
+    );
+    expectPass(
+      "should pass when given a string of all digits",
+      () => Awesomize.Validator.isBigInt(
+        maybeString("18446744073709551615"),
+        empty
+      ),
+    );
+    expectPass(
+      "should pass when given an empty value",
+      () => Awesomize.Validator.isBigInt(None, empty),
+    );
+  });
   describe("recursive", () => {
     let schema =
       Awesomize.make([|

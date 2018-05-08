@@ -87,6 +87,20 @@ let isInt =
     Js.Math.ceil_float(n) == n ? None : Some("not_int")
   );
 
+let isBigInt =
+  Compile.stringTest(str => {
+    let isZero = s => Js.Re.test(s, [%bs.re "/^\\-\\d+|0+$/"]);
+    let isBigIntLike = s => Js.Re.test(s, [%bs.re "/^\\d{1,20}$/"]);
+
+    if (String.length(str) > 20) {
+      Some("maximum");
+    } else if (isZero(str)) {
+      Some("minimum");
+    } else {
+      isBigIntLike(str) ? None : Some("not_big_int");
+    }
+  });
+
 let isEqualNumber = x =>
   Compile.numberTest(n => n == x ? None : Some("not_equal"));
 

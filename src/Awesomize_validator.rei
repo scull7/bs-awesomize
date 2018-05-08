@@ -52,6 +52,8 @@ let isInt: (maybe, sanitized) => result;
 
 let isString: (maybe, sanitized) => result;
 
+let isBigInt: (maybe, sanitized) => result;
+
 let notEqualNumber: (float, maybe, sanitized) => result;
 
 let notEqualString: (string, maybe, sanitized) => result;

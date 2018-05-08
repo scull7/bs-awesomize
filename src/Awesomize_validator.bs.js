@@ -113,6 +113,29 @@ function isInt(param, param$1) {
               }), param, param$1);
 }
 
+function isBigInt(param, param$1) {
+  return stringTest((function (str) {
+                var isZero = function (s) {
+                  return (/^\-\d+|0+$/).test(s);
+                };
+                var isBigIntLike = function (s) {
+                  return (/^\d{1,20}$/).test(s);
+                };
+                if (str.length > 20) {
+                  return /* Some */["maximum"];
+                } else if (isZero(str)) {
+                  return /* Some */["minimum"];
+                } else {
+                  var match = isBigIntLike(str);
+                  if (match) {
+                    return /* None */0;
+                  } else {
+                    return /* Some */["not_big_int"];
+                  }
+                }
+              }), param, param$1);
+}
+
 function isEqualNumber(x) {
   return (function (param, param$1) {
       return numberTest((function (n) {
@@ -362,6 +385,7 @@ exports.externArray = externArray;
 exports.externDependentNumber = externDependentNumber;
 exports.externDependentRaw = externDependentRaw;
 exports.externDependentString = externDependentString;
+exports.isBigInt = isBigInt;
 exports.externNumber = externNumber;
 exports.externRaw = externRaw;
 exports.externString = externString;
