@@ -103,6 +103,9 @@ let maxStringLength = length =>
     String.length(str) <= length ? None : Some("max_length")
   );
 
+let maxNumber = max =>
+  Compile.numberTest(n => n <= max ? None : Some("maximum"));
+
 let externRaw = (fn, msg, maybe, sanitized) =>
   fn(maybe, sanitized) |> Js.Promise.resolve |> reply(msg);
 

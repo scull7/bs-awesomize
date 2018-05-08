@@ -87,6 +87,8 @@ let minStringLength: (int, maybe, sanitized) => result;
 
 let maxStringLength: (int, maybe, sanitized) => result;
 
+let maxNumber: (float, maybe, sanitized) => result;
+
 let notEqualNumber: (float, maybe, sanitized) => result;
 
 let notEqualString: (string, maybe, sanitized) => result;
