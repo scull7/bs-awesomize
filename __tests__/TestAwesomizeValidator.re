@@ -544,6 +544,30 @@ describe("Awesomize Validator", () => {
       }
     );
   });
+  describe("matchRegex", () => {
+    expectFail(
+      "should fail when the string does not match the regex",
+      () => {
+        let validator = Awesomize.Validator.matchRegex([%bs.re "/\\d+/"]);
+        validator(maybeString("moo"), empty);
+      },
+      "not_match",
+    );
+    expectPass(
+      "should pass when the string matches the regex",
+      () => {
+        let validator = Awesomize.Validator.matchRegex([%bs.re "/moo/"]);
+        validator(maybeString("moo"), empty);
+      },
+    );
+    expectPass(
+      "should pass when given an empty value",
+      () => {
+        let validator = Awesomize.Validator.matchRegex([%bs.re "/\\d+/"]);
+        validator(None, empty);
+      }
+    );
+  });
   describe("isBigInt", () => {
     expectFail(
       "should fail when the string is more than 20 digits",

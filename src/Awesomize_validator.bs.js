@@ -214,6 +214,19 @@ function minNumber(min) {
     });
 }
 
+function matchRegex(re) {
+  return (function (param, param$1) {
+      return stringTest((function (str) {
+                    var match = re.test(str);
+                    if (match) {
+                      return /* None */0;
+                    } else {
+                      return /* Some */["not_match"];
+                    }
+                  }), param, param$1);
+    });
+}
+
 function externRaw(fn, msg, maybe, sanitized) {
   return reply(msg, Promise.resolve(Curry._2(fn, maybe, sanitized)));
 }
@@ -393,6 +406,7 @@ exports.isEqualNumber = isEqualNumber;
 exports.isEqualString = isEqualString;
 exports.isInt = isInt;
 exports.isString = isString;
+exports.matchRegex = matchRegex;
 exports.minStringLength = minStringLength;
 exports.maxStringLength = maxStringLength;
 exports.maxNumber = maxNumber;

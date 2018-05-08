@@ -123,6 +123,9 @@ let maxNumber = max =>
 let minNumber = min =>
   Compile.numberTest(n => n >= min ? None : Some("minimum"));
 
+let matchRegex = re =>
+  Compile.stringTest(str => Js.Re.test(str, re) ? None : Some("not_match"));
+
 let externRaw = (fn, msg, maybe, sanitized) =>
   fn(maybe, sanitized) |> Js.Promise.resolve |> reply(msg);
 
