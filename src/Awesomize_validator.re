@@ -207,8 +207,8 @@ let recursive = validator => {
         validator(dict)
         |> Js.Promise.then_(result =>
              switch (result) {
-             | `Error(_) => falsePromise
-             | `Ok(_) => awesomizer(xs)
+             | Result.Error(_) => Js.Promise.resolve(false)
+             | Result.Ok(_) => awesomizer(xs)
              }
            )
       | _ => falsePromise

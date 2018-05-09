@@ -191,7 +191,7 @@ module Awesomize = {
     let resolveError = validated =>
       validated
       |> Validate.Response.toErrorMap
-      |> (map => `Error(map) |> resolve);
+      |> (map => Result.Error(map) |> resolve);
     let unwrapMap = m1 =>
       Belt.Map.String.(
         reduce(m1, empty, (m2, key, value) =>
@@ -204,7 +204,7 @@ module Awesomize = {
     let resolveOk = sanitized =>
       normalize(sanitized)
       |> then_(normalized =>
-           normalized |> unwrapMap |> (x => `Ok(x) |> resolve)
+           normalized |> unwrapMap |> (x => Result.Ok(x) |> resolve)
          );
     input =>
       read(input)
@@ -225,8 +225,6 @@ let make = Awesomize.make;
 let fromJs = input => input |> JavaScript.inputConvert |> Awesomize.make;
 
 module Read = Awesomize_read;
-
-module Result = Awesomize_result;
 
 module Normalizer = Awesomize_data_scrub;
 

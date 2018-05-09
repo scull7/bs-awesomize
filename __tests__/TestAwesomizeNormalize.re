@@ -27,15 +27,15 @@ describe("Awesomize Normalize", () => {
     |]);
   testPromise("Normalize should run when the value exists", () =>
     schema([|("test", Js.Json.string("moo"))|] |> Js.Dict.fromArray)
-    |> Awesomize.Result.fold(
+    |> Result.Promise.fold(
          err => {
            Js.log2("Awesome Normalize:1 - ", err);
-           (-1.0);
+           (-1.0) |> Js.Promise.resolve;
          },
          res =>
            switch (Belt.Map.String.get(res, "test")) {
-           | None => (-2.0)
-           | Some(x) => parseNumber(x)
+           | None => (-2.0) |> Js.Promise.resolve
+           | Some(x) => parseNumber(x) |> Js.Promise.resolve
            },
        )
     |> Js.Promise.then_(result =>

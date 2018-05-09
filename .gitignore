@@ -25,7 +25,7 @@ setup.log
 .merlin
 /lib/
 *.log
+**.bs.js
 .bsb.lock
 tests/test.data
-__tests__/*.bs.js
 /coverage

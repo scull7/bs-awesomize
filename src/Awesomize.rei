@@ -53,15 +53,13 @@ type jsInput =
 
 let make:
   (schema, Js.Dict.t(Js.Json.t)) =>
-  Js.Promise.t([> | `Error(errorMap) | `Ok(resultMap)]);
+  Js.Promise.t(Result.result(errorMap, resultMap));
 
 let fromJs:
   (jsInput, Js.Dict.t(Js.Json.t)) =>
-  Js.Promise.t([> | `Error(errorMap) | `Ok(resultMap)]);
+  Js.Promise.t(Result.result(errorMap,resultMap));
 
 module Read = Awesomize_read;
-
-module Result = Awesomize_result;
 
 module Normalizer = Awesomize_data_scrub;
 
