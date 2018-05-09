@@ -460,17 +460,13 @@ describe("Awesomize Validator", () => {
     expectPass(
       "should pass when given a string that does meet the length requirement",
       () => {
-        let validator = Awesomize.Validator.minStringLength(3);
-        validator(maybeString("moo"), empty);
-      }
-    );
-    expectPass(
-      "should pass when given an empty value",
-      () => {
-        let validator = Awesomize.Validator.minStringLength(3);
-        validator(None, empty);
-      }
-    );
+      let validator = Awesomize.Validator.minStringLength(3);
+      validator(maybeString("moo"), empty);
+    });
+    expectPass("should pass when given an empty value", () => {
+      let validator = Awesomize.Validator.minStringLength(3);
+      validator(None, empty);
+    });
   });
   describe("maxStringLength", () => {
     expectFail(
@@ -484,17 +480,13 @@ describe("Awesomize Validator", () => {
     expectPass(
       "should pass when given a string that does meet the length requirement",
       () => {
-        let validator = Awesomize.Validator.maxStringLength(3);
-        validator(maybeString("moo"), empty);
-      }
-    );
-    expectPass(
-      "should pass when given an empty value",
-      () => {
-        let validator = Awesomize.Validator.maxStringLength(3);
-        validator(None, empty);
-      }
-    );
+      let validator = Awesomize.Validator.maxStringLength(3);
+      validator(maybeString("moo"), empty);
+    });
+    expectPass("should pass when given an empty value", () => {
+      let validator = Awesomize.Validator.maxStringLength(3);
+      validator(None, empty);
+    });
   });
   describe("maxNumber", () => {
     expectFail(
@@ -506,19 +498,14 @@ describe("Awesomize Validator", () => {
       "maximum",
     );
     expectPass(
-      "should pass when given a number which is less than the maximum",
-      () => {
-        let validator = Awesomize.Validator.maxNumber(3.0);
-        validator(maybeNumber(1.0), empty);
-      }
-    );
-    expectPass(
-      "should pass when given an empty value",
-      () => {
-        let validator = Awesomize.Validator.maxNumber(3.0);
-        validator(None, empty);
-      }
-    );
+      "should pass when given a number which is less than the maximum", () => {
+      let validator = Awesomize.Validator.maxNumber(3.0);
+      validator(maybeNumber(1.0), empty);
+    });
+    expectPass("should pass when given an empty value", () => {
+      let validator = Awesomize.Validator.maxNumber(3.0);
+      validator(None, empty);
+    });
   });
   describe("minNumber", () => {
     expectFail(
@@ -530,19 +517,14 @@ describe("Awesomize Validator", () => {
       "minimum",
     );
     expectPass(
-      "should pass when given a number which is greater than the minimum",
-      () => {
-        let validator = Awesomize.Validator.minNumber(3.0);
-        validator(maybeNumber(4.0), empty);
-      }
-    );
-    expectPass(
-      "should pass when given an empty value",
-      () => {
-        let validator = Awesomize.Validator.minNumber(3.0);
-        validator(None, empty);
-      }
-    );
+      "should pass when given a number which is greater than the minimum", () => {
+      let validator = Awesomize.Validator.minNumber(3.0);
+      validator(maybeNumber(4.0), empty);
+    });
+    expectPass("should pass when given an empty value", () => {
+      let validator = Awesomize.Validator.minNumber(3.0);
+      validator(None, empty);
+    });
   });
   describe("matchRegex", () => {
     expectFail(
@@ -553,20 +535,14 @@ describe("Awesomize Validator", () => {
       },
       "not_match",
     );
-    expectPass(
-      "should pass when the string matches the regex",
-      () => {
-        let validator = Awesomize.Validator.matchRegex([%bs.re "/moo/"]);
-        validator(maybeString("moo"), empty);
-      },
-    );
-    expectPass(
-      "should pass when given an empty value",
-      () => {
-        let validator = Awesomize.Validator.matchRegex([%bs.re "/\\d+/"]);
-        validator(None, empty);
-      }
-    );
+    expectPass("should pass when the string matches the regex", () => {
+      let validator = Awesomize.Validator.matchRegex([%bs.re "/moo/"]);
+      validator(maybeString("moo"), empty);
+    });
+    expectPass("should pass when given an empty value", () => {
+      let validator = Awesomize.Validator.matchRegex([%bs.re "/\\d+/"]);
+      validator(None, empty);
+    });
   });
   describe("isUSEIN", () => {
     expectFail(
@@ -594,88 +570,71 @@ describe("Awesomize Validator", () => {
       () => Awesomize.Validator.isUSEIN(maybeString("692345678"), empty),
       "not_match",
     );
-    expectPass(
-      "should pass when the string is a valid EIN (with-dash)",
-      () => Awesomize.Validator.isUSEIN(maybeString("99-2345678"), empty),
+    expectPass("should pass when the string is a valid EIN (with-dash)", () =>
+      Awesomize.Validator.isUSEIN(maybeString("99-2345678"), empty)
     );
-    expectPass(
-      "should pass when the string is a valid EIN (no-dash)",
-      () => Awesomize.Validator.isUSEIN(maybeString("012345678"), empty),
+    expectPass("should pass when the string is a valid EIN (no-dash)", () =>
+      Awesomize.Validator.isUSEIN(maybeString("012345678"), empty)
     );
-    expectPass(
-      "should pass when given an empty value",
-      () => {
-        let validator = Awesomize.Validator.matchRegex([%bs.re "/\\d+/"]);
-        validator(None, empty);
-      }
-    );
+    expectPass("should pass when given an empty value", () => {
+      let validator = Awesomize.Validator.matchRegex([%bs.re "/\\d+/"]);
+      validator(None, empty);
+    });
   });
   describe("isBigInt", () => {
     expectFail(
       "should fail when the string is more than 20 digits",
-      () => Awesomize.Validator.isBigInt(
-        maybeString("184467440737095516157"),
-        empty
-      ),
+      () =>
+        Awesomize.Validator.isBigInt(
+          maybeString("184467440737095516157"),
+          empty,
+        ),
       "maximum",
     );
     expectFail(
       "should fail when the string represents zero",
-      () => Awesomize.Validator.isBigInt(
-        maybeString("00000"),
-        empty
-      ),
+      () => Awesomize.Validator.isBigInt(maybeString("00000"), empty),
       "minimum",
     );
     expectFail(
       "should fail when the string represents positive zero",
-      () => Awesomize.Validator.isBigInt(
-        maybeString("0"),
-        empty
-      ),
+      () => Awesomize.Validator.isBigInt(maybeString("0"), empty),
       "minimum",
     );
     expectFail(
       "should fail when the string represents negative zero",
-      () => Awesomize.Validator.isBigInt(
-        maybeString("-0"),
-        empty
-      ),
+      () => Awesomize.Validator.isBigInt(maybeString("-0"), empty),
       "minimum",
     );
     expectFail(
       "should fail when the string represents a negative number",
-      () => Awesomize.Validator.isBigInt(
-        maybeString("-1234896323423434"),
-        empty
-      ),
+      () =>
+        Awesomize.Validator.isBigInt(
+          maybeString("-1234896323423434"),
+          empty,
+        ),
       "minimum",
     );
     expectFail(
       "should fail when the string contains non digits",
-      () => Awesomize.Validator.isBigInt(
-        maybeString("84467440A37095516157"),
-        empty
-      ),
+      () =>
+        Awesomize.Validator.isBigInt(
+          maybeString("84467440A37095516157"),
+          empty,
+        ),
       "not_big_int",
     );
-    expectPass(
-      "should pass when given a '20'",
-      () => Awesomize.Validator.isBigInt(
-        maybeString("20"),
-        empty,
-      ),
+    expectPass("should pass when given a '20'", () =>
+      Awesomize.Validator.isBigInt(maybeString("20"), empty)
     );
-    expectPass(
-      "should pass when given a string of all digits",
-      () => Awesomize.Validator.isBigInt(
+    expectPass("should pass when given a string of all digits", () =>
+      Awesomize.Validator.isBigInt(
         maybeString("18446744073709551615"),
-        empty
-      ),
+        empty,
+      )
     );
-    expectPass(
-      "should pass when given an empty value",
-      () => Awesomize.Validator.isBigInt(None, empty),
+    expectPass("should pass when given an empty value", () =>
+      Awesomize.Validator.isBigInt(None, empty)
     );
   });
   describe("recursive", () => {

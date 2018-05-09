@@ -92,14 +92,13 @@ let isBigInt =
     /* https://regex101.com/r/hbktb0/1 */
     let isZero = s => Js.Re.test(s, [%bs.re "/^\\-\\d+$|^0+$/"]);
     let isBigIntLike = s => Js.Re.test(s, [%bs.re "/^\\d{1,20}$/"]);
-
     if (String.length(str) > 20) {
       Some("maximum");
     } else if (isZero(str)) {
       Some("minimum");
     } else {
       isBigIntLike(str) ? None : Some("not_big_int");
-    }
+    };
   });
 
 let isEqualNumber = x =>
@@ -128,13 +127,16 @@ let matchRegex = re =>
   Compile.stringTest(str => Js.Re.test(str, re) ? None : Some("not_match"));
 
 /*
-** Regex will require updating if new prefixes are added.
-** https://regex101.com/r/ASlLeu/2/tests
-** https://www.irs.gov/businesses/small-businesses-self-employed/how-eins-are-assigned-and-valid-ein-prefixes
-*/
-let isUSEIN = matchRegex([%bs.re
-  "/^(0[1-6]|1[0-6]|2[0-7]|[345]\\d|[68][0-8]|7[1-7]|9[0-58-9])-?\\d{7}$/"
-]);
+ ** Regex will require updating if new prefixes are added.
+ ** https://regex101.com/r/ASlLeu/2/tests
+ ** https://www.irs.gov/businesses/small-businesses-self-employed/how-eins-are-assigned-and-valid-ein-prefixes
+ */
+let isUSEIN =
+  matchRegex(
+    [%bs.re
+      "/^(0[1-6]|1[0-6]|2[0-7]|[345]\\d|[68][0-8]|7[1-7]|9[0-58-9])-?\\d{7}$/"
+    ],
+  );
 
 let externRaw = (fn, msg, maybe, sanitized) =>
   fn(maybe, sanitized) |> Js.Promise.resolve |> reply(msg);

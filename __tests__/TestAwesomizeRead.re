@@ -68,10 +68,12 @@ describe("Awesomize.Read", () =>
       "should return None when attempting to access a path on a boolean", () =>
       Awesomize.Read.path(["baz", "buzz"], data)
       |> Js.Promise.then_(result =>
-           switch (result) {
-           | None => pass
-           | Some(_) => fail("unexpected_json_result")
-           }
+           (
+             switch (result) {
+             | None => pass
+             | Some(_) => fail("unexpected_json_result")
+             }
+           )
            |> Js.Promise.resolve
          )
     );
