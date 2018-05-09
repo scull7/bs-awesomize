@@ -207,13 +207,8 @@ let recursive = validator => {
         validator(dict)
         |> Js.Promise.then_(result =>
              switch (result) {
-<<<<<<< HEAD
              | Result.Error(_) => Js.Promise.resolve(false)
              | Result.Ok(_) => awesomizer(xs)
-=======
-             | `Error(_) => falsePromise
-             | `Ok(_) => awesomizer(xs)
->>>>>>> 226cc63c5d292c4c33f28bb2a12aed1e9b417969
              }
            )
       | _ => falsePromise

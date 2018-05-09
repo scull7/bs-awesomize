@@ -28,8 +28,4 @@ setup.log
 **.bs.js
 .bsb.lock
 tests/test.data
-<<<<<<< HEAD
-=======
-__tests__/*.bs.js
->>>>>>> 226cc63c5d292c4c33f28bb2a12aed1e9b417969
 /coverage
