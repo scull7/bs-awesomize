@@ -116,7 +116,7 @@ function isInt(param, param$1) {
 function isBigInt(param, param$1) {
   return stringTest((function (str) {
                 var isZero = function (s) {
-                  return (/^\-\d+|0+$/).test(s);
+                  return (/^\-\d+$|^0+$/).test(s);
                 };
                 var isBigIntLike = function (s) {
                   return (/^\d{1,20}$/).test(s);

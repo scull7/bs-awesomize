@@ -660,6 +660,13 @@ describe("Awesomize Validator", () => {
       "not_big_int",
     );
     expectPass(
+      "should pass when given a '20'",
+      () => Awesomize.Validator.isBigInt(
+        maybeString("20"),
+        empty,
+      ),
+    );
+    expectPass(
       "should pass when given a string of all digits",
       () => Awesomize.Validator.isBigInt(
         maybeString("18446744073709551615"),

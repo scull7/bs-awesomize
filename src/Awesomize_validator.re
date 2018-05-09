@@ -89,7 +89,8 @@ let isInt =
 
 let isBigInt =
   Compile.stringTest(str => {
-    let isZero = s => Js.Re.test(s, [%bs.re "/^\\-\\d+|0+$/"]);
+    /* https://regex101.com/r/hbktb0/1 */
+    let isZero = s => Js.Re.test(s, [%bs.re "/^\\-\\d+$|^0+$/"]);
     let isBigIntLike = s => Js.Re.test(s, [%bs.re "/^\\d{1,20}$/"]);
 
     if (String.length(str) > 20) {
