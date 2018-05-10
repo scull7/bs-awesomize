@@ -7,9 +7,16 @@
     "clean": "bsb -clean-world",
     "coverage": "nyc report --temp-directory=coverage --reporter=text-lcov | coveralls",
     "install:peers": "yarn add $(jq -r '.peerDependencies|keys|join(\" \")' package.json)",
+    "precommit": "lint-staged",
     "start": "bsb -make-world -w",
     "test": "yarn run clean; yarn run build; jest --coverage && yarn run coverage",
     "watch:jest": "jest --coverage --watchAll"
+  },
+  "lint-staged": {
+    "*.{re,rei}": [
+      "refmt --in-place",
+      "git add"
+    ]
   },
   "main": "index.js",
   "repository": "git@github.com:scull7/bs-awesomize.git",
@@ -23,6 +30,8 @@
     "express": "^4.16.3",
     "morgan": "^1.9.0",
     "nyc": "^11.6.0",
+    "husky": "^0.14.3",
+    "lint-staged": "^7.1.0",
     "ramda": "^0.25.0"
   },
   "dependencies": {
