@@ -99,7 +99,9 @@ module Validate = {
     Compiler.make((key, definition) =>
       switch (definition.validate) {
       | [] =>
-        failwith({j|You must provide at least one validator for key: $key|j})
+        Js.Exn.raiseError(
+          {j|You must provide at least one validator for key: $key|j},
+        )
       | tests => run(key, tests)
       }
     );
@@ -150,30 +152,29 @@ module JavaScript = {
     | None => None
     | Some(fn) =>
       Some(
-        (
-          (maybe, parsed) =>
-            switch (maybe) {
-            | None => Js.Promise.resolve(None)
-            | Some(json) =>
-              fn(. json, parsed)
-              |> Js.Promise.then_(result =>
-                   Js.Nullable.toOption(result) |> Js.Promise.resolve
-                 )
-            }
-        ),
+        (maybe, parsed) =>
+          switch (maybe) {
+          | None => Js.Promise.resolve(None)
+          | Some(json) =>
+            fn(. json, parsed)
+            |> Js.Promise.then_(result =>
+                 Js.Nullable.toOption(result) |> Js.Promise.resolve
+               )
+          },
       )
     };
-  let inputConvert = (input: t) : array((string, definition)) =>
+  let inputConvert = (input: t): array((string, definition)) =>
     Array.map(
-      ((key, def)) => (
-        key,
-        {
-          read: convertRead(def##read),
-          sanitize: convertScrubber(def##sanitize),
-          validate: Belt.List.fromArray(def##validate),
-          normalize: convertScrubber(def##normalize),
-        },
-      ),
+      ((key, def)) =>
+        (
+          key,
+          {
+            read: convertRead(def##read),
+            sanitize: convertScrubber(def##sanitize),
+            validate: Belt.List.fromArray(def##validate),
+            normalize: convertScrubber(def##normalize),
+          },
+        ),
       input,
     );
 };
@@ -214,8 +215,8 @@ module Awesomize = {
            |> then_(validated => resolve((validated, sanitized)))
          )
       |> then_(((validated, sanitized)) =>
-           validated |> Validate.Response.hasError ?
-             resolveError(validated) : resolveOk(sanitized)
+           validated |> Validate.Response.hasError
+             ? resolveError(validated) : resolveOk(sanitized)
          );
   };
 };

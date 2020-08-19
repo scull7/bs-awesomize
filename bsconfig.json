@@ -13,8 +13,12 @@
       "type": "dev"
     }
   ],
-  "bs-dev-dependencies": [ "@glennsl/bs-jest" ],
-  "bs-dependencies": [ ],
-  "bsc-flags": [ "-bs-super-errors", "-bs-sort-imports" ],
+  "bs-dev-dependencies": [
+    "@glennsl/bs-jest"
+  ],
+  "bs-dependencies": [],
+  "bsc-flags": [
+    "-bs-super-errors"
+  ],
   "refmt": 3
 }

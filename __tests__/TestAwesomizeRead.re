@@ -58,11 +58,12 @@ describe("Awesomize.Read", () =>
          )
     );
     test("should throw when given an empty list", () => {
-      let message = "Path must have at least one item";
+      let matcher = [%re "/Path must have at least one item$/"];
+
       Expect.expect(() =>
         Awesomize.Read.path([], data)
       )
-      |> Expect.toThrowMessage(message);
+      |> Expect.toThrowMessageRe(matcher);
     });
     testPromise(
       "should return None when attempting to access a path on a boolean", () =>

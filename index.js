@@ -103,9 +103,9 @@ exports.compile = function compile (schema) {
 
 Validate.extern = (fn, msg) => {
   const executor = (a, b, c) => fn(a, b, c);
-  return Validate.JavaScript[1](executor, msg);
+  return Validate.JavaScript.extern(executor, msg);
 };
-Validate.externDependent = Validate.JavaScript[2];
+Validate.externDependent = Validate.JavaScript.externDependent;
 
 exports.make = Awesomize.make;
 exports.Normalize = Scrubber;

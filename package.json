@@ -14,7 +14,7 @@
   },
   "lint-staged": {
     "*.{re,rei}": [
-      "refmt --in-place",
+      "bsrefmt --in-place",
       "git add"
     ]
   },
@@ -23,7 +23,7 @@
   "author": "Nathan Sculli <scull7@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "@glennsl/bs-jest": "^0.4.2",
+    "@glennsl/bs-jest": "^0.5.1",
     "awesomize": "^0.1.19",
     "benchmark": "^2.1.4",
     "coveralls": "^3.0.0",
@@ -35,6 +35,6 @@
     "ramda": "^0.25.0"
   },
   "dependencies": {
-    "bs-platform": "^4.0.1"
+    "bs-platform": "^8.2.0"
   }
 }

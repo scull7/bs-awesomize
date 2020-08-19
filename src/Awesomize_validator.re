@@ -90,8 +90,8 @@ let isInt =
 let isBigInt =
   Compile.stringTest(str => {
     /* https://regex101.com/r/hbktb0/1 */
-    let isZero = s => Js.Re.test(s, [%bs.re "/^\\-\\d+$|^0+$/"]);
-    let isBigIntLike = s => Js.Re.test(s, [%bs.re "/^\\d{1,20}$/"]);
+    let isZero = Js.Re.test_([%re "/^\-\d+$|^0+$/"]);
+    let isBigIntLike = Js.Re.test_([%re "/^\d{1,20}$/"]);
     if (String.length(str) > 20) {
       Some("maximum");
     } else if (isZero(str)) {
@@ -124,7 +124,7 @@ let minNumber = min =>
   Compile.numberTest(n => n >= min ? None : Some("minimum"));
 
 let matchRegex = re =>
-  Compile.stringTest(str => Js.Re.test(str, re) ? None : Some("not_match"));
+  Compile.stringTest(str => Js.Re.test_(re, str) ? None : Some("not_match"));
 
 /*
  ** Regex will require updating if new prefixes are added.
@@ -226,7 +226,7 @@ let recursive = validator => {
 
 module JavaScript = {
   [@bs.scope "Promise"] [@bs.val]
-  external jsResolve : 'a => Js.Promise.t('a) = "resolve";
+  external jsResolve: 'a => Js.Promise.t('a) = "resolve";
   /*
    let extractDependentValue =
      fun
